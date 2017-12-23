@@ -94,19 +94,33 @@ def filterbytype(key,table):
         i=i+1
     return ndatab
 
+def filterbyyear(key,table):
+    ndatab = copy.deepcopy(table)
+    m = 1
+    z = len(table[0])
+    while m < z : 
+        if key[str(table[0][m])] == 0:
+            k=0
+            while k < len(table):
+                del ndatab[k][m]
+                k=k+1
+            z = len(ndatab[0])
+        m= m + 1
+    return ndatab
 
 key1 = {'Ayancik':0,'Boyabat':0,'Dikmen':1,'Duragan':1,'Erfelek':1,'Gerze':0,'Merkez':1,'Sarayduzu':0,'Turkeli': 1}
 key2 = {'Total':1,'Man':1,'Woman':0,'Town':1,'Village':0}
+key3 = {'2015':1,'2014':0,'2013':0,'2012':0,'2011':0,'2010':1,'2009':1}
 print( key1['Duragan'] )
 abcc = 'Boyabat'
 print( key1[abcc] )
 def index():
     return htmlify("My lovely website",
-                   showalldata(contents))
+                   showalldata(contents)+showalldata(filterbyyear(key3,contents)))
 
 def aabb():
     return htmlify("Myy lovely website",
-                   showalldata(filterbydis(key1,key2,contents)))
+                   showalldata(filterbyyear(key3,filterbydis(key1,key2,contents))))
 
 
 
