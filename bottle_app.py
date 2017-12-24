@@ -5,7 +5,7 @@
 ### The landing page for assignment 3 should be at /
 #####################################################################
 
-from bottle import route, run, default_app, debug
+from bottle import route, run, default_app, debug, get, request
 import copy
 from csv import reader
 contents = []
@@ -13,6 +13,24 @@ input_file = open("database.csv","r")
 for row in reader(input_file):
     contents = contents + [row]
 
+ssss = """
+<form action="/" method="GET">
+        <fieldset>
+            <legend><h1></h1>Filter Data by:<h1></h1></legend>
+            <h3>District</h3><br>
+            <input type="checkbox" name="Ayancik" value="1">Ayancık
+            <input type="checkbox" name="Boyabat" value="1">Boyabat
+            <input type="checkbox" name="Dikmen" value="1">Dikmen
+            <input type="checkbox" name="Duragan" value="1">Durağan
+            <input type="checkbox" name="Erfelek" value="1">Erfelek
+            <input type="checkbox" name="Gerze" value="1">Gerze
+            <input type="checkbox" name="Merkez" value="1">Merkez
+            <input type="checkbox" name="Sarayduzu" value="1">Saraydüzü
+            <input type="checkbox" name="Turkeli" value="1">Türkeli
+            <input type="submit" value="Submit">
+         </fieldset>
+</form>
+"""
 def htmlify(title,text):
     page = """
         <!doctype html>
@@ -108,18 +126,27 @@ def filterbyyear(key,table):
         m= m + 1
     return ndatab
 
+
 key1 = {'Ayancik':0,'Boyabat':0,'Dikmen':1,'Duragan':1,'Erfelek':1,'Gerze':0,'Merkez':1,'Sarayduzu':0,'Turkeli': 1}
 key2 = {'Total':1,'Man':1,'Woman':0,'Town':1,'Village':0}
 key3 = {'2015':1,'2014':0,'2013':0,'2012':0,'2011':0,'2010':1,'2009':1}
-print( key1['Duragan'] )
-abcc = 'Boyabat'
-print( key1[abcc] )
+
+
 def index():
-    return htmlify("My lovely website",
-                   showalldata(contents)+showalldata(filterbyyear(key3,contents)))
+    skey1 = key1
+    diclist1 = list(skey1.keys())
+    for name in diclist1:
+        if request.GET.get(name) != None :
+            skey1[name]= int(request.GET.get(name))
+        else :
+            skey1[name] = 0
+    
+    return htmlify("My lovely website",ssss+ "<p>" + str(diclist1) + "</p><p>" + str(skey1) + "</p>" +
+                   showalldata(contents)+ "<br><br><br><br>" + showalldata(filterbydis(skey1,key2,contents)))
 
 def aabb():
-    return htmlify("Myy lovely website",
+    
+    return htmlify(str(a)+"budur",ssss+
                    showalldata(filterbyyear(key3,filterbydis(key1,key2,contents))))
 
 
