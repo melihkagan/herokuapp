@@ -13,8 +13,21 @@ input_file = open("database.csv","r")
 for row in reader(input_file):
     contents = contents + [row]
 
+welcome = """
+    <h1>Welcome Sinop Population Database by District</h1>
+    <p>All data is shown below. Use menu to manipulate data.</p>
+    <br>
+"""
+
+searchform = """
+<form action="/search" method="get">
+  Search for district:
+  <input name="dis" type="text">
+  <input type="submit">
+</form>
+"""
 filterform = """
-<form action="/" method="get">
+<form action="/filterpage" method="get">
         <fieldset>
             <legend>Filter Data by:</legend>
             <p style="font-size: 20;margin-bottom: 4px;">District:</p><br>
@@ -47,6 +60,17 @@ filterform = """
          </fieldset>
 </form>
 """
+def showstat(liste):
+    stats = """
+        <p> Here is some detail: </p>
+        <p>Population rate between 2015-2014 (%%) : %s </p>
+        <p> Man in total (%%) : %s </p>
+        <p> Woman in total (%%) : %s </p>
+        <p> Live in town  (%%) : %s </p>
+        <p> Live in village (%%) : %s </p>
+    """ % ( liste[0],liste[1],liste[2],liste[3],liste[4] )
+    return stats
+
 def htmlify(title,text):
     page = """
         <!doctype html>
@@ -55,18 +79,58 @@ def htmlify(title,text):
                 <meta charset="utf-8" />
                 <title>%s</title>
                 <style>
-table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
-th, td {
-    padding: 5px;
-    text-align: left;
-}
-</style>
+                table, th, td {
+                    border: 1px solid black;
+                    border-collapse: collapse;
+                        }
+                th, td {
+                        padding: 5px;
+                        text-align: left;
+                }
+                div.con{
+                    background-color: transparent;
+                    margin-left: 10px;
+                    }
+                body {
+                    background-color: rgb(180, 211, 171);
+                    }
+                nav{
+                    background-color: rgb(48,48,68);
+                    overflow: hidden;
+                    width: 100%%;
+                    margin-top: 0px;
+                    top: 0px;
+                    left: 0px;
+                    }
+                nav a {
+                    background-color: rgb(48,48,68);
+                    float: left;
+                    display: block;
+                    color: rgb(79,150,67);
+                    text-align: center;
+                    padding: 14px 16px;
+                    text-decoration: none;
+                    }
+                nav a:hover {
+                    background-color: rgb(77,119,181);
+                    color: black;
+                }
+                nav a:active {
+                    background-color: rgb(153,180,200);
+                    color: black;
+                </style>
             </head>
             <body>
+            <nav>
+		<a href="/">Home</a>		
+		<a href="/filterpage">Filter Data</a>
+		<a href="/search">Search District</a>
+            </nav>
+            
+            <div class="con">
+            <br><br>
             %s
+            </div>
             </body>
         </html>
 
@@ -144,9 +208,33 @@ def filterbyyear(key,table):
         z = z + 1
     return ndatab
 
+def finddis(disname,table):
+    disname = disname.lower()
+    p=0
+    dis = []
+    dis= dis + [table[0]]
+    while p < len(table):
+        if disname.capitalize() == str(table[p][0]):
+            k=0
+            while k<6 :
+                dis = dis + [table[p+k]]
+                k=k+1
+        p= p + 1
+    return dis
+
+def disstat(dis):
+    poprate = str( ((int(dis[2][1])-int(dis[2][2]))/int(dis[2][2]))*100)
+    man = str( (int(dis[3][1])/int(dis[2][1]))*100)
+    woman = str( (int(dis[4][1])/int(dis[2][1]))*100)
+    town = str( (int(dis[5][1])/int(dis[2][1]))*100)
+    village = str( (int(dis[6][1])/int(dis[2][1]))*100)
+    stat= [poprate,man,woman,town,village]
+    return stat
+
 key1 = {'Ayancik':0,'Boyabat':0,'Dikmen':0,'Duragan':0,'Erfelek':0,'Gerze':0,'Merkez':0,'Sarayduzu':0,'Turkeli': 0}
 key2 = {'Total':0,'Man':0,'Woman':0,'Town':0,'Village':0}
 key3 = {'2015':0,'2014':0,'2013':0,'2012':0,'2011':0,'2010':0,'2009':0}
+disnlist = list(key1.keys())
 
 def resetkey(akey):
     liste = list(akey.keys())
@@ -161,7 +249,7 @@ def nkey2(alist):
     return keym
 
 
-def index():
+def filterpage():
     skey1 = key1.copy()
     diclist1 = list(skey1.keys())
     for name in diclist1:
@@ -182,18 +270,26 @@ def index():
             skey3[name] = int(yearfil[a])
             a = a + 1
     
-    return htmlify("My lovely website",filterform+"<p>"+str(skey3)+"</p>" "<p>" + str(skey2) + "</p><p>" + str(yearfil) + "</p>" +
-                   showalldata(contents)+ "<br><br><br><br>" + showalldata(filterbydis(skey1,skey2,filterbyyear(skey3,contents))))
+    return htmlify("Filter Data",filterform + showalldata(filterbydis(skey1,skey2,filterbyyear(skey3,contents))))
 
-def aabb():
+def search():
+    disname=request.GET.get("dis")
+    if disname == None :
+        return htmlify("Search",searchform)
+    elif (str(disname).lower()).capitalize() in disnlist :
+        return htmlify(str(disname).lower(),showstat(disstat(finddis(str(disname),contents)))+"<br>"+showalldata(finddis(str(disname),contents)))
+    else :
+        return htmlify("Error","<h3>Try again:</h3>"+searchform)
     
-    return htmlify("budur",str(key3)+"<br>"+
-                   showalldata(filterbyyear(key3,contents)))
+
+def index():
+    
+    return htmlify("Sinop Population Database",welcome+showalldata(contents))
 
 
-
+route('/search', 'GET' , search)
+route('/filterpage', 'GET', filterpage)
 route('/', 'GET', index)
-route('/aabb', 'GET', aabb)
 
 
 #####################################################################
