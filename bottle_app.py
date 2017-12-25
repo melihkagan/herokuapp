@@ -5,7 +5,7 @@
 ### The landing page for assignment 3 should be at /
 #####################################################################
 
-from bottle import route, run, default_app, debug, get, request
+from bottle import route, run, default_app, debug, get, request , static_file
 import copy
 from csv import reader
 contents = []
@@ -79,63 +79,7 @@ def htmlify(title,text):
             <head>
                 <meta charset="utf-8" />
                 <title>%s</title>
-                <style>
-                table, th, td {
-                    border: 1px solid black;
-                    border-collapse: collapse;
-                        }
-                th, td {
-                        padding: 5px;
-                        text-align: left;
-                }
-                div.con{
-                    background-color: transparent;
-                    margin-left: 10px;
-                    }
-                body {
-                    background-color: rgb(180, 211, 171);
-                    font-family: "Verdana", The Quick , sans-serif;
-                    }
-                nav{
-                    background-color: rgb(48,48,68);
-                    overflow: hidden;
-                    width: 100%%;
-                    margin-top: 0px;
-                    top: 0px;
-                    left: 0px;
-                    }
-                nav a {
-                    background-color: rgb(48,48,68);
-                    float: left;
-                    display: block;
-                    color: rgb(79,150,67);
-                    text-align: center;
-                    padding: 14px 16px;
-                    text-decoration: none;
-                    }
-                nav a:hover {
-                    background-color: rgb(77,119,181);
-                    color: black;
-                }
-                nav a:active {
-                    background-color: rgb(153,180,200);
-                    color: black;
-                    }
-                select {
-                    background-color: rgb(219, 239, 213);
-                    border: 3px solid #303044;
-                    }
-                fieldset {
-                    border : 5px solid #303044;
-                    }
-                input[type=submit] {
-                    background-color: rgb(48,48,68);
-                    border: none;
-                    color: white;
-                    padding: 16px 32px;
-                    text-decoration: none;
-                    cursor: pointer;
-                </style>
+                <link rel="stylesheet" href="/static/style.css">        
             </head>
             <body>
             <nav>
@@ -291,7 +235,10 @@ def index():
     
     return htmlify("Sinop Population Database",welcome+showalldata(contents))
 
+def server_static(fname):
+   return static_file(fname, root='./css')
 
+route('/static/<fname>','GET',server_static)
 route('/search', 'GET' , search)
 route('/filterpage', 'GET', filterpage)
 route('/', 'GET', index)
