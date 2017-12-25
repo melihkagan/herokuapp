@@ -13,11 +13,11 @@ input_file = open("database.csv","r")
 for row in reader(input_file):
     contents = contents + [row]
 
-ssss = """
-<form action="/" method="GET">
+filterform = """
+<form action="/" method="get">
         <fieldset>
-            <legend><h1></h1>Filter Data by:<h1></h1></legend>
-            <h3>District</h3><br>
+            <legend>Filter Data by:</legend>
+            <p style="font-size: 20;margin-bottom: 4px;">District:</p><br>
             <input type="checkbox" name="Ayancik" value="1">Ayancık
             <input type="checkbox" name="Boyabat" value="1">Boyabat
             <input type="checkbox" name="Dikmen" value="1">Dikmen
@@ -26,8 +26,24 @@ ssss = """
             <input type="checkbox" name="Gerze" value="1">Gerze
             <input type="checkbox" name="Merkez" value="1">Merkez
             <input type="checkbox" name="Sarayduzu" value="1">Saraydüzü
-            <input type="checkbox" name="Turkeli" value="1">Türkeli
-            <input type="submit" value="Submit">
+            <input type="checkbox" name="Turkeli" value="1">Türkeli<br>
+            <br>
+            <p style="float: left;font-size: 20;">Type:</p>
+            <div style="float: left; margin-right: 80px; margin-left: 20px;">
+            <select name="types" size="4" multiple style="width: 90px;" >
+                <option value="Total">Total</option>
+                <option value="Man">Man</option>
+                <option value="Woman">Woman</option>
+                <option value="Town">Town</option>
+                <option value="Village">Village</option>
+            </select></div>
+            <p style="float: left;font-size: 20">Year:</p>
+            <div style="float: left; margin-left: 20px; margin-right: 70px">
+            <input type="radio" name="years" value="1111111"> All years<br>
+            <input type="radio" name="years" value="1110000"> 2015-2013<br>
+            <input type="radio" name="years" value="1010101"> Only odd years<br>
+            </div>
+            <input type="submit" value="Filter" style="float: none">
          </fieldset>
 </form>
 """
@@ -113,41 +129,66 @@ def filterbytype(key,table):
     return ndatab
 
 def filterbyyear(key,table):
-    ndatab = copy.deepcopy(table)
-    m = 1
-    z = len(table[0])
-    while m < z : 
-        if key[str(table[0][m])] == 0:
-            k=0
-            while k < len(table):
-                del ndatab[k][m]
-                k=k+1
-            z = len(ndatab[0])
-        m= m + 1
+    ndatab = []
+    liste = list(key.keys())
+    z= 0
+    while z< len(table):
+        m=1
+        row = [] 
+        row = row + [str(table[z][0])]
+        for name in liste:
+            if key[name] == 1 :
+                row = row + [str(table[z][m])]
+            m = m + 1
+        ndatab = ndatab + [row]
+        z = z + 1
     return ndatab
 
+key1 = {'Ayancik':0,'Boyabat':0,'Dikmen':0,'Duragan':0,'Erfelek':0,'Gerze':0,'Merkez':0,'Sarayduzu':0,'Turkeli': 0}
+key2 = {'Total':0,'Man':0,'Woman':0,'Town':0,'Village':0}
+key3 = {'2015':0,'2014':0,'2013':0,'2012':0,'2011':0,'2010':0,'2009':0}
 
-key1 = {'Ayancik':0,'Boyabat':0,'Dikmen':1,'Duragan':1,'Erfelek':1,'Gerze':0,'Merkez':1,'Sarayduzu':0,'Turkeli': 1}
-key2 = {'Total':1,'Man':1,'Woman':0,'Town':1,'Village':0}
-key3 = {'2015':1,'2014':0,'2013':0,'2012':0,'2011':0,'2010':1,'2009':1}
+def resetkey(akey):
+    liste = list(akey.keys())
+    for name in liste:
+        akey[name] = 0
+    return akey
+
+def nkey2(alist):
+    keym = resetkey(key2.copy())
+    for name in alist:
+        keym[name] = 1
+    return keym
 
 
 def index():
-    skey1 = key1
+    skey1 = key1.copy()
     diclist1 = list(skey1.keys())
     for name in diclist1:
         if request.GET.get(name) != None :
             skey1[name]= int(request.GET.get(name))
         else :
             skey1[name] = 0
+
+    typelist = request.GET.getall("types")
+    skey2= nkey2(typelist)
+
+    yearfil = list(str(request.GET.get("years")))
+    skey3 = key3.copy()
+    diclist2 = list(skey3.keys())
+    if len(yearfil) > 5 :
+        a=0
+        for name in diclist2:
+            skey3[name] = int(yearfil[a])
+            a = a + 1
     
-    return htmlify("My lovely website",ssss+ "<p>" + str(diclist1) + "</p><p>" + str(skey1) + "</p>" +
-                   showalldata(contents)+ "<br><br><br><br>" + showalldata(filterbydis(skey1,key2,contents)))
+    return htmlify("My lovely website",filterform+"<p>"+str(skey3)+"</p>" "<p>" + str(skey2) + "</p><p>" + str(yearfil) + "</p>" +
+                   showalldata(contents)+ "<br><br><br><br>" + showalldata(filterbydis(skey1,skey2,filterbyyear(skey3,contents))))
 
 def aabb():
     
-    return htmlify(str(a)+"budur",ssss+
-                   showalldata(filterbyyear(key3,filterbydis(key1,key2,contents))))
+    return htmlify("budur",str(key3)+"<br>"+
+                   showalldata(filterbyyear(key3,contents)))
 
 
 
