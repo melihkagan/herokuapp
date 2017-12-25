@@ -221,6 +221,9 @@ def nkey2(alist):
 
 
 def filterpage():
+    if request.GET.get("years") == None :
+        return htmlify("Filter Data",filterform)
+    
     skey1 = key1.copy()
     diclist1 = list(skey1.keys())
     for name in diclist1:
