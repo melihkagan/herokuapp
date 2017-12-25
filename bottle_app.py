@@ -13,6 +13,11 @@ input_file = open("database.csv","r")
 for row in reader(input_file):
     contents = contents + [row]
 
+mes= """
+    <p>You see total values for Sinop(province). Use search button for display districts.</p>
+    <p>Districts: Ayancik,Boyabat,Dikmen,Duragan,Erfelek,Gerze,Sarayduzu,Turkeli,Merkez </p>
+"""
+
 welcome = """
     <h1>Welcome Sinop Population Database by District</h1>
     <p>All data is shown below. Use menu to manipulate data.</p>
@@ -123,6 +128,7 @@ def showalldata(data):
     table1 = table1 + "</table>"
     return table1
 
+
 def filterbydis(key,key2,table):
     ndatab = []
     ndatab = ndatab + [table[0]]
@@ -170,6 +176,22 @@ def finddis(disname,table):
                 k=k+1
         p= p + 1
     return dis
+
+def sinop():
+    tablekk=copy.deepcopy(finddis("Merkez",contents))
+    for i in range(2,7):
+        for j in range(1,8):
+            tot=0
+            k=0
+            while True:
+                try:
+                    tot = tot + int(contents[i+k][j])
+                    k = k + 6
+                except IndexError :
+                    break
+            tablekk[i][j] = str(tot)
+    tablekk[1][0]="Sinop"
+    return tablekk
 
 def disstat(dis):
     poprate = str( ((int(dis[2][1])-int(dis[2][2]))/int(dis[2][2]))*100)
@@ -223,8 +245,9 @@ def filterpage():
 
 def search():
     disname=request.GET.get("dis")
+    general = sinop()
     if disname == None :
-        return htmlify("Search",searchform)
+        return htmlify("Search",searchform+mes+showstat(disstat(general))+showalldata(general))
     elif (str(disname).lower()).capitalize() in disnlist :
         return htmlify(str(disname).lower(),showstat(disstat(finddis(str(disname),contents)))+"<br>"+showalldata(finddis(str(disname),contents)))
     else :
