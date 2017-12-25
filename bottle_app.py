@@ -23,8 +23,8 @@ searchform = """
 <form action="/search" method="get">
   Search for district:
   <input name="dis" type="text">
-  <input type="submit">
-</form>
+  <input type="submit" value="Search" >
+</form> <br>
 """
 filterform = """
 <form action="/filterpage" method="get">
@@ -59,6 +59,7 @@ filterform = """
             <input type="submit" value="Filter" style="float: none">
          </fieldset>
 </form>
+<br><br><br>
 """
 def showstat(liste):
     stats = """
@@ -93,6 +94,7 @@ def htmlify(title,text):
                     }
                 body {
                     background-color: rgb(180, 211, 171);
+                    font-family: "Verdana", The Quick , sans-serif;
                     }
                 nav{
                     background-color: rgb(48,48,68);
@@ -118,6 +120,21 @@ def htmlify(title,text):
                 nav a:active {
                     background-color: rgb(153,180,200);
                     color: black;
+                    }
+                select {
+                    background-color: rgb(219, 239, 213);
+                    border: 3px solid #303044;
+                    }
+                fieldset {
+                    border : 5px solid #303044;
+                    }
+                input[type=submit] {
+                    background-color: rgb(48,48,68);
+                    border: none;
+                    color: white;
+                    padding: 16px 32px;
+                    text-decoration: none;
+                    cursor: pointer;
                 </style>
             </head>
             <body>
@@ -178,18 +195,6 @@ def filterbydis(key,key2,table):
         else:
             ndatab[0][0]="Error"
             break
-    return ndatab
-
-def filterbytype(key,table):
-    ndatab = []
-    ndatab = ndatab + [table[0]]
-    i=1
-    while i < len(table):
-        if str(table[i][1]) == '' :
-            ndatab = ndatab + [table[i]]
-        elif key[table[i][0]] == 1 :
-            ndatab = ndatab + [table[i]]
-        i=i+1
     return ndatab
 
 def filterbyyear(key,table):
