@@ -15,7 +15,7 @@ for row in reader(input_file):
 
 mes= """
     <p>You see total values for Sinop(province). Use search button for display districts.</p>
-    <p>Districts: Ayancik,Boyabat,Dikmen,Duragan,Erfelek,Gerze,Sarayduzu,Turkeli,Merkez </p>
+    <p>Districts: Ayancik, Boyabat, Dikmen, Duragan, Erfelek, Gerze, Sarayduzu, Turkeli, Merkez </p>
 """
 
 welcome = """
